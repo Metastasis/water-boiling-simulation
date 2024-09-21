@@ -1,4 +1,6 @@
-// simulation.js
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls';
+
 
 // Scene, Camera, Renderer Setup
 const scene = new THREE.Scene();
@@ -15,7 +17,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Controls
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 // Lighting
 const ambientLight = new THREE.AmbientLight(0x404040, 2);
