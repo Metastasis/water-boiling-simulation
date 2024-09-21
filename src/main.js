@@ -54,7 +54,7 @@ scene.add(water);
 let bubbleCount = 200;
 const bubbleGeometry = new THREE.BufferGeometry();
 const bubblePositions = new Float32Array(bubbleCount * 3);
-const bubbleSpeeds = [];
+let bubbleSpeeds = [];
 
 for (let i = 0; i < bubbleCount; i++) {
   bubblePositions[i * 3] = (Math.random() - 0.5) * 5;
@@ -163,21 +163,24 @@ function adjustParticleSystems() {
 function updateBubbleCount(newCount) {
   if (newCount === bubbleCount) return; // No change needed
 
-  // Dispose of existing bubble geometry
+  // Dispose of existing bubble geometry and material
   bubbles.geometry.dispose();
   bubbles.material.dispose();
   scene.remove(bubbles);
 
+  // Reinitialize bubbleSpeeds
+  bubbleSpeeds = [];
+
   // Create new bubble system with updated count
   const bubbleGeometry = new THREE.BufferGeometry();
   const bubblePositions = new Float32Array(newCount * 3);
-  const bubbleSpeeds = [];
 
   for (let i = 0; i < newCount; i++) {
     bubblePositions[i * 3] = (Math.random() - 0.5) * 5;
     bubblePositions[i * 3 + 1] = Math.random() * 0.1;
     bubblePositions[i * 3 + 2] = (Math.random() - 0.5) * 5;
 
+    // Populate the global bubbleSpeeds array
     bubbleSpeeds.push(0.02 + Math.random() * 0.02);
   }
 
@@ -223,7 +226,14 @@ function animate() {
   // Update Bubbles
   const positions = bubbles.geometry.attributes.position.array;
   for (let i = 0; i < bubbleCount; i++) {
-    positions[i * 3 + 1] += bubbleSpeeds[i];
+    // Safety check to prevent NaN
+    if (typeof bubbleSpeeds[i] === 'number' && !isNaN(bubbleSpeeds[i])) {
+      positions[i * 3 + 1] += bubbleSpeeds[i];
+    } else {
+      // Assign a default speed if undefined
+      bubbleSpeeds[i] = 0.02;
+      positions[i * 3 + 1] += bubbleSpeeds[i];
+    }
 
     if (positions[i * 3 + 1] > 4.9) {
       positions[i * 3] = (Math.random() - 0.5) * 5;
