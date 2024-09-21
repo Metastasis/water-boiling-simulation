@@ -77,9 +77,48 @@ const bubbleMaterial = new THREE.PointsMaterial({
 const bubbles = new THREE.Points(bubbleGeometry, bubbleMaterial);
 scene.add(bubbles);
 
-// Animation Loop
+// Steam Particle System
+const steamCount = 100;
+const steamGeometry = new THREE.BufferGeometry();
+const steamPositions = new Float32Array(steamCount * 3);
+const steamSpeeds = [];
+
+for (let i = 0; i < steamCount; i++) {
+  steamPositions[i * 3] = (Math.random() - 0.5) * 2;
+  steamPositions[i * 3 + 1] = 5 + Math.random() * 0.5;
+  steamPositions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+
+  steamSpeeds.push(0.01 + Math.random() * 0.01);
+}
+
+steamGeometry.setAttribute('position', new THREE.BufferAttribute(steamPositions, 3));
+
+const steamMaterial = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 0.2,
+  transparent: true,
+  opacity: 0.5,
+});
+
+const steam = new THREE.Points(steamGeometry, steamMaterial);
+scene.add(steam);
+
+// Update Steam in Animation Loop
 function animate() {
   requestAnimationFrame(animate);
+
+  // Update Steam
+  const steamPos = steam.geometry.attributes.position.array;
+  for (let i = 0; i < steamCount; i++) {
+    steamPos[i * 3 + 1] += steamSpeeds[i];
+
+    if (steamPos[i * 3 + 1] > 10) {
+      steamPos[i * 3] = (Math.random() - 0.5) * 2;
+      steamPos[i * 3 + 1] = 5;
+      steamPos[i * 3 + 2] = (Math.random() - 0.5) * 2;
+    }
+  }
+  steam.geometry.attributes.position.needsUpdate = true;
 
   // Update Bubbles
   const positions = bubbles.geometry.attributes.position.array;
