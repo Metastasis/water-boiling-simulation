@@ -28,20 +28,25 @@ scene.add(directionalLight);
 
 // Water Container (Pot)
 const potGeometry = new THREE.CylinderGeometry(3, 3, 5, 32, 1, true);
-const potMaterial = new THREE.MeshPhongMaterial({
-  color: 0xaaaaaa,
-  side: THREE.DoubleSide,
+const potMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff,
   transparent: true,
-  opacity: 0.5,
+  opacity: 0.2,
+  roughness: 0.1,
+  metalness: 0.1,
+  clearcoat: 1,
+  clearcoatRoughness: 0.1,
+  // refractionRatio: 0.98, // Removed this line
+  side: THREE.DoubleSide,
 });
 const pot = new THREE.Mesh(potGeometry, potMaterial);
 pot.position.y = 2.5;
 scene.add(pot);
 
 // Water Surface
-const waterGeometry = new THREE.CircleGeometry(3, 32);
+const waterGeometry = new THREE.CircleGeometry(2.9, 32);
 const waterMaterial = new THREE.MeshPhongMaterial({
-  color: 0x1e90ff,
+  color: 0x0077be,
   transparent: true,
   opacity: 0.8,
 });
@@ -140,6 +145,20 @@ function updatePhysics() {
   if (temperature > 25 && mass > 0) {
     temperature -= COOLING_RATE;
   }
+
+  // Update Water Level based on mass
+  const maxMass = 5; // Define the maximum mass corresponding to full water level
+  const minMass = 0; // Minimum mass corresponds to no water
+  const normalizedMass = (mass - minMass) / (maxMass - minMass); // Normalize mass between 0 and 1
+  const minScale = 0.1; // Minimum scale to ensure water plane is visible when nearly empty
+  const newScaleY = THREE.MathUtils.lerp(minScale, 1, normalizedMass);
+  water.scale.setScalar(newScaleY);
+
+  // Adjust water position based on mass
+  const maxHeight = 4.9; // Just below the top of the pot
+  const minHeight = 0.1; // Bottom of the pot
+  const newPositionY = THREE.MathUtils.lerp(minHeight, maxHeight, normalizedMass);
+  water.position.y = newPositionY;
 }
 
 // Adjust particle systems based on temperature
