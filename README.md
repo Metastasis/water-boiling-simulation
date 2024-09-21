@@ -2,10 +2,6 @@
 
 A 3D simulation of boiling water created using Three.js. This project visualizes the physics of water boiling, including temperature changes, mass loss due to evaporation, and particle effects for bubbles and steam.
 
-## Demo
-
-*Add a link to a live demo if available.*
-
 ## Installation
 
 1. **Clone the repository**
